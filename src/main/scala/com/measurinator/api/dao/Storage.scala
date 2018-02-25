@@ -12,19 +12,19 @@ class Storage extends MeasurementStorage with ClientStorage with SensorStorage w
 
   val cluster : Cluster = Cluster.builder()
     .addContactPoints(hosts.toArray: _*)
-    .build();
+    .build()
 
   val cassandraSession: Session = cluster.connect("temperatures")
 
   val propertyMapper = new DefaultPropertyMapper()
     .setNamingStrategy(new DefaultNamingStrategy(
       NamingConventions.LOWER_CAMEL_CASE,
-      NamingConventions.LOWER_SNAKE_CASE));
+      NamingConventions.LOWER_SNAKE_CASE))
 
   val configuration =
     MappingConfiguration.builder()
       .withPropertyMapper(propertyMapper)
-      .build();
+      .build()
 
   val manager = new MappingManager(cassandraSession, configuration)
 }

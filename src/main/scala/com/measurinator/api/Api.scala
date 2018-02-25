@@ -23,8 +23,11 @@ trait Service {
 
   implicit val measurementRoutes : MeasurementRoutes
 
+  implicit val statusRoutes : StatusRoutes
+
   lazy val routes: Route = {
       measurementRoutes.routes ~
+      statusRoutes.routes ~
       (get & pathEndOrSingleSlash) {
         complete("Measurinator Scala API")
       }
@@ -39,6 +42,7 @@ object Api extends App with Service {
   implicit val materializer: ActorMaterializer = ActorMaterializer()
   implicit val storage: Storage = new Storage
   implicit val measurementRoutes = new MeasurementRoutes(storage)
+  implicit val statusRoutes = new StatusRoutes(storage)
 
   Http().bindAndHandle(routes, "127.0.0.1", 8899)
 }
