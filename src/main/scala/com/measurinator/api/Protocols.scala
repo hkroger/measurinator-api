@@ -4,7 +4,7 @@ import java.util.UUID
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import com.scalapenos.spray._
-import com.measurinator.api.entities.{ClientMeasurement, Measurement}
+import com.measurinator.api.entities.{ClientMeasurement, Location, Measurement}
 import spray.json.{DefaultJsonProtocol, DeserializationException, JsString, JsValue, JsonFormat}
 
 /**
@@ -24,6 +24,7 @@ trait Protocols extends SprayJsonSupport with DefaultJsonProtocol {
   }
 
   implicit val measurementJsonFormat = jsonFormat6(Measurement)
+  implicit val locationJsonFormat = jsonFormat4(Location)
   implicit val errorMessageJsonFormat = jsonFormat1(ErrorMessage)
 }
 

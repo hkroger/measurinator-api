@@ -1,12 +1,12 @@
 package com.measurinator.api
 
-import java.util.UUID
-
+import akka.event.{Logging, LoggingAdapter}
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import com.measurinator.api.dao.Storage
-import com.measurinator.api.entities.{ClientMeasurement, Measurement}
+import com.measurinator.api.entities.ClientMeasurement
+import org.joda.time.DateTime
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.implicitConversions
@@ -37,56 +37,77 @@ class MeasurementRoutes(storage: Storage)(implicit ec: ExecutionContext) extends
   val routes: Route = pathPrefix("measurements") {
     handleExceptions(exceptionHandler) {
       (post & pathEndOrSingleSlash) {
-        entity(as[ClientMeasurement]) { clientMeasurement =>
-          val eventualMaybeClient = Future {
-            storage.findClient(clientMeasurement.clientId)
-          }
-
-          val eventualMaybeSensor = Future {
-            storage.findSensor(clientMeasurement.sensorId)
-          }
-
-          val futureMeasurement =
-            for {maybeClient <- eventualMaybeClient
-                 maybeSensor <- eventualMaybeSensor
-                 maybeLocation <- Future(maybeSensor.map(s => storage.findLocation(clientMeasurement.clientId, s.locationId)).flatten)
-            } yield {
-
-              if (maybeClient.isEmpty) {
-                throw new UnknownClient(clientMeasurement.clientId)
-              }
-              val client = maybeClient.get
-              checkChecksum(clientMeasurement, client.signingKey.toString)
-
-              if (maybeSensor.isEmpty) {
-                throw new UnknownSensor(clientMeasurement.sensorId)
-              }
-              val sensor = maybeSensor.get
-
-              if (maybeLocation.isEmpty) {
-                throw new UnknownLocation(clientMeasurement.clientId, sensor.locationId)
-              }
-
-              val measurement = toDomainMeasurement(clientMeasurement, sensor.locationId)
-
-              storage.saveMeasurement(measurement)
-              storage.updateMeasurementStats(measurement)
-              storage.updateMeasurementsHourlyAvg(measurement)
-              storage.updateMeasurementsDailyMinMax(measurement)
-              storage.updateMeasurementsDailyAvg(measurement)
-              storage.updateMeasurementsMonthlyMinMax(measurement)
-              storage.updateMeasurementsMonthlyAvg(measurement)
-              clientMeasurement
+        logRequest("POST measurements", Logging.DebugLevel) {
+          entity(as[ClientMeasurement]) { clientMeasurement =>
+            val eventualMaybeClient = Future {
+              storage.findClient(clientMeasurement.clientId)
             }
 
-          complete(futureMeasurement)
+            val eventualMaybeSensor = Future {
+              storage.findSensor(clientMeasurement.sensorId)
+            }
+
+            val futureMeasurement =
+              for {maybeClient <- eventualMaybeClient
+                   maybeSensor <- eventualMaybeSensor
+                   maybeLocation <- Future(maybeSensor.flatMap(s => storage.findLocationByClient(clientMeasurement.clientId, s.locationId)))
+                   } yield {
+
+                if (maybeClient.isEmpty) {
+                  throw UnknownClient(clientMeasurement.clientId)
+                }
+                val client = maybeClient.get
+                checkChecksum(clientMeasurement, client.signingKey.toString)
+
+                if (maybeSensor.isEmpty) {
+                  throw UnknownSensor(clientMeasurement.sensorId)
+                }
+                val sensor = maybeSensor.get
+
+                if (maybeLocation.isEmpty) {
+                  throw UnknownLocation(clientMeasurement.clientId, sensor.locationId)
+                }
+
+                val measurement = toDomainMeasurement(clientMeasurement, sensor.locationId)
+
+                storage.saveMeasurement(measurement)
+                storage.updateMeasurementStats(measurement)
+                storage.updateMeasurementsHourlyAvg(measurement)
+                storage.updateMeasurementsDailyMinMax(measurement)
+                storage.updateMeasurementsDailyAvg(measurement)
+                storage.updateMeasurementsMonthlyMinMax(measurement)
+                storage.updateMeasurementsMonthlyAvg(measurement)
+                clientMeasurement
+              }
+
+            complete(futureMeasurement)
+          }
         }
-      } ~ (get & path(Segment) & pathEndOrSingleSlash) { ip =>
-        complete(Measurement(1, "temp", UUID.randomUUID(), 1.0, 1.0, 1.0))
+      } ~ (get & pathEndOrSingleSlash & parameters('location_id.as[Int], 'client_id, 'from, 'to)) { (locationId, clientId, from, to) =>
+        handleExceptions(exceptionHandler) {
+          val eventualMaybeClient = Future {
+            storage.findClient(clientId)
+          }
+          val measurements: Future[List[entities.Measurement]] = for {maybeClient <- eventualMaybeClient
+                                                                      maybeLocation <- Future(storage.findLocationByClient(clientId, locationId))
+          } yield {
+            if (maybeClient.isEmpty) {
+              throw UnknownClient(clientId)
+            }
+
+            if (maybeLocation.isEmpty) {
+              throw UnknownLocation(clientId, locationId)
+            }
+
+            val fromDatetime = DateTime.parse(from)
+            val toDatetime = DateTime.parse(to)
+
+            storage.findMeasurementsRange(locationId, fromDatetime, toDatetime).map(toDomainMeasurement)
+          }
+
+          complete(measurements)
+        }
       }
     }
   }
 }
-
-
-

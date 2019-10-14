@@ -2,7 +2,7 @@ name := "api"
 
 version := "1.0"
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.12.10"
 
 resolvers ++= Seq(
   "Typesafe repository snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
@@ -17,45 +17,35 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= {
-  val akkaV = "2.4.4"
-  val cassandraV = "3.2.0"
+  val akkaHttpV = "10.1.10"
+  val akkaStreamV = "2.5.25"
+  val cassandraV = "3.7.2"
+  val nscalaV = "2.22.0"
+  val logbackV = "1.2.3"
+  val hasherV = "1.2.2"
 
   Seq(
-    "com.typesafe.akka" %% "akka-http-core" % akkaV,
-    "com.typesafe.akka" %% "akka-http-experimental" % akkaV,
-    "com.typesafe.akka" %% "akka-stream" % akkaV,
-    "com.typesafe.akka" %% "akka-http-spray-json-experimental" % akkaV,
-    "ch.qos.logback" % "logback-classic" % "1.2.3",
-    "ch.qos.logback" % "logback-core" % "1.2.3",
-    "com.roundeights" %% "hasher" % "1.2.0",
+    "com.typesafe.akka" %% "akka-http-core" % akkaHttpV,
+    "com.typesafe.akka" %% "akka-http" % akkaHttpV,
+    "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpV,
+    "com.typesafe.akka" %% "akka-stream" % akkaStreamV,
+    "ch.qos.logback" % "logback-classic" % logbackV,
+    "ch.qos.logback" % "logback-core" % logbackV,
+    "com.outr" %% "hasher" % hasherV,
     "com.datastax.cassandra" % "cassandra-driver-core" % cassandraV,
-    "com.datastax.cassandra" % "cassandra-driver-mapping" % cassandraV
-
+    "com.datastax.cassandra" % "cassandra-driver-mapping" % cassandraV,
+    "com.github.nscala-time" %% "nscala-time" % nscalaV
   )
 }
 
-lazy val api = (project in file("."))
-  .enablePlugins(Mobilizer)
+//lazy val api = (project in file("."))
+//  .enablePlugins(Mobilizer)
 
-// Define deployment environments.
-import fi.onesto.sbt.mobilizer.DeploymentEnvironment
+enablePlugins(JavaAppPackaging)
+enablePlugins(DockerPlugin)
 
-deployEnvironments := Map(
-  'node2 -> DeploymentEnvironment(
-    hosts         = Seq("hkroger.info"),
-    port          = 2222,
-    rsyncOpts     = Seq("-e", "ssh -p 2222"),
-    rootDirectory = "/opt/measurinator-api"),
-  'node3 -> DeploymentEnvironment(
-    hosts         = Seq("hkroger.info"),
-    port          = 2223,
-    rsyncOpts     = Seq("-e", "ssh -p 2223"),
-    rootDirectory = "/opt/measurinator-api"),
-  'node4 -> DeploymentEnvironment(
-    hosts         = Seq("hkroger.info"),
-    port          = 2224,
-    rsyncOpts     = Seq("-e", "ssh -p 2224"),
-    rootDirectory = "/opt/measurinator-api")
+mainClass in Compile := Some("com.measurinator.api.Api")
 
-
-)
+dockerBaseImage := "openjdk:jre"
+dockerExposedPorts := Seq(8899)
+packageName in Docker := "hkroger/measurinator-api"

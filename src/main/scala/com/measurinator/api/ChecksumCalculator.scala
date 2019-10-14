@@ -11,6 +11,15 @@ trait ChecksumCalculator {
 
   def calculateChecksum(clientMeasurement: ClientMeasurement, secret: String): String = {
     val checksummedString = clientMeasurement.version match {
+      case 3 => clientMeasurement.version + "&" +
+        clientMeasurement.timestamp + "&" +
+        clientMeasurement.voltage + "&" +
+        clientMeasurement.signalStrength + "&" +
+        clientMeasurement.clientId + "&" +
+        clientMeasurement.sensorId + "&" +
+        clientMeasurement.measurement + "&" +
+        secret
+      // "#{hsh[:version]}&#{hsh[:timestamp]}&#{hsh[:voltage]}&#{hsh[:signal_strength]}&#{hsh[:client_id]}&#{hsh[:location_id]||hsh[:sensor_id]}&#{hsh[:measurement]}&#{secret}"
       case 2 => clientMeasurement.version + "&" +
         clientMeasurement.timestamp + "&" +
         clientMeasurement.voltage + "&" +

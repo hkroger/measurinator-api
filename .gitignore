@@ -1,3 +1,4 @@
 .idea
 .deploy.sh.swp
 target
+.DS_Store
