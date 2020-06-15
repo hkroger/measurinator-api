@@ -11,9 +11,6 @@ import org.joda.time.DateTime
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.implicitConversions
 
-/**
-  * Created by hkroger on 28/3/2017.
-  */
 class MeasurementRoutes(storage: Storage)(implicit ec: ExecutionContext) extends Protocols with SnakifiedProtocols with ChecksumCalculator with DomainConversions {
   case class UnknownClient(clientId: String) extends Exception
   case class UnknownLocation(clientId: String, locationId: Int) extends Exception

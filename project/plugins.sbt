@@ -1,2 +1,2 @@
 logLevel := Level.Warn
-addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.3.18")
+addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.7.2")

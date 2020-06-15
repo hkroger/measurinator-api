@@ -2,17 +2,17 @@ name := "api"
 
 version := "1.0"
 
-scalaVersion := "2.12.10"
+scalaVersion := "2.12.11"
 
 resolvers ++= Seq(
   "Typesafe repository snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
   "Typesafe repository releases" at "http://repo.typesafe.com/typesafe/releases/",
-  "Sonatype repo"                    at "https://oss.sonatype.org/content/groups/scala-tools/",
-  "Sonatype releases"                at "https://oss.sonatype.org/content/repositories/releases",
-  "Sonatype snapshots"               at "https://oss.sonatype.org/content/repositories/snapshots",
-  "Sonatype staging"                 at "http://oss.sonatype.org/content/repositories/staging",
-  "Java.net Maven2 Repository"       at "http://download.java.net/maven/2/",
-  "Twitter Repository"               at "http://maven.twttr.com",
+  "Sonatype repo" at "https://oss.sonatype.org/content/groups/scala-tools/",
+  "Sonatype releases" at "https://oss.sonatype.org/content/repositories/releases",
+  "Sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+  "Sonatype staging" at "http://oss.sonatype.org/content/repositories/staging",
+  "Java.net Maven2 Repository" at "http://download.java.net/maven/2/",
+  "Twitter Repository" at "http://maven.twttr.com",
   Resolver.bintrayRepo("websudos", "oss-releases")
 )
 
@@ -23,6 +23,7 @@ libraryDependencies ++= {
   val nscalaV = "2.22.0"
   val logbackV = "1.2.3"
   val hasherV = "1.2.2"
+  val scalaTestV = "3.1.2"
 
   Seq(
     "com.typesafe.akka" %% "akka-http-core" % akkaHttpV,
@@ -34,7 +35,9 @@ libraryDependencies ++= {
     "com.outr" %% "hasher" % hasherV,
     "com.datastax.cassandra" % "cassandra-driver-core" % cassandraV,
     "com.datastax.cassandra" % "cassandra-driver-mapping" % cassandraV,
-    "com.github.nscala-time" %% "nscala-time" % nscalaV
+    "com.github.nscala-time" %% "nscala-time" % nscalaV,
+    "org.scalactic" %% "scalactic" % scalaTestV,
+    "org.scalatest" %% "scalatest" % scalaTestV % "test"
   )
 }
 

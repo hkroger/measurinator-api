@@ -8,9 +8,6 @@ import com.measurinator.api.entities.{ClientMeasurement, Location, Measurement}
 
 import scala.util.Random
 
-/**
-  * Created by hkroger on 10/4/2017.
-  */
 trait DomainConversions {
   val yearMonthDateFormat = new SimpleDateFormat("YYYY-MM")
 

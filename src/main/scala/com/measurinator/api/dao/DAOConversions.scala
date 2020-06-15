@@ -7,7 +7,7 @@ import com.measurinator.api.dao.entities.Measurement
   */
 trait DAOConversions {
   implicit def measurement2daoMeasurement(m: com.measurinator.api.entities.Measurement): Measurement = {
-    new Measurement(
+    Measurement(
       m.locationId,
       m.yearMonth,
       m.id,

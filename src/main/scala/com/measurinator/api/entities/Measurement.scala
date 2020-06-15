@@ -12,7 +12,6 @@ case class Measurement(locationId: Int,
                        signalStrength: BigDecimal,
                        voltage: BigDecimal) {
   def getDay: java.util.Date = {
-
     // TODO: Figure out a better way to truncate
     val ts = new DateTime(UUIDs.unixTimestamp(id))
     ts.withTimeAtStartOfDay().toDate
@@ -27,7 +26,6 @@ case class Measurement(locationId: Int,
   def getHour: DateTime = {
     // TODO: Figure out a better way to truncate
     getTimestamp.
-      withMillis(0).
       withMinuteOfHour(0).
       withSecondOfMinute(0).
       withMillisOfSecond(0)
