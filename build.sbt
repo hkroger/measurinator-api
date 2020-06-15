@@ -2,7 +2,7 @@ name := "api"
 
 version := "1.0"
 
-scalaVersion := "2.12.11"
+scalaVersion := "2.13.2"
 
 resolvers ++= Seq(
   "Typesafe repository snapshots" at "https://repo.typesafe.com/typesafe/snapshots/",
@@ -17,10 +17,10 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= {
-  val akkaHttpV = "10.1.10"
-  val akkaStreamV = "2.5.25"
-  val cassandraV = "3.7.2"
-  val nscalaV = "2.22.0"
+  val akkaHttpV = "10.1.12"
+  val akkaStreamV = "2.6.6"
+  val cassandraV = "3.9.0"
+  val nscalaV = "2.24.0"
   val logbackV = "1.2.3"
   val hasherV = "1.2.2"
   val scalaTestV = "3.1.2"
@@ -40,9 +40,6 @@ libraryDependencies ++= {
     "org.scalatest" %% "scalatest" % scalaTestV % "test"
   )
 }
-
-//lazy val api = (project in file("."))
-//  .enablePlugins(Mobilizer)
 
 enablePlugins(JavaAppPackaging)
 enablePlugins(DockerPlugin)
