@@ -9,7 +9,7 @@ import com.measurinator.api.entities.{ClientMeasurement, Location, Measurement}
 import scala.util.Random
 
 trait DomainConversions {
-  val yearMonthDateFormat = new SimpleDateFormat("YYYY-MM")
+  val yearMonthDateFormat = new SimpleDateFormat("yyyy-MM")
 
   def toDomainLocation(l: dao.entities.Location): Location = {
     Location(
