@@ -1,25 +1,26 @@
 package com.measurinator.api
 
-import akka.event.{Logging, LoggingAdapter}
+import akka.event.Logging
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import com.measurinator.api.dao.Storage
 import com.measurinator.api.entities.ClientMeasurement
+import com.typesafe.scalalogging.LazyLogging
 import org.joda.time.DateTime
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.implicitConversions
 
-class MeasurementRoutes(storage: Storage)(implicit ec: ExecutionContext) extends Protocols with SnakifiedProtocols with ChecksumCalculator with DomainConversions {
+class MeasurementRoutes(storage: Storage)(implicit ec: ExecutionContext) extends Protocols with SnakifiedProtocols with ChecksumCalculator with DomainConversions with LazyLogging {
   case class UnknownClient(clientId: String) extends Exception
   case class UnknownLocation(clientId: String, locationId: Int) extends Exception
   case class UnknownSensor(sensorId: String) extends Exception
 
   val exceptionHandler = ExceptionHandler {
     case checksumError: ChecksumErrorException =>
-      complete(StatusCodes.Unauthorized,
-        ErrorMessage("Checksums don't match: " + checksumError.clientChecksum + " vs. " + checksumError.calculatedChecksum))
+      logger.debug("Checksums don't match. Received: " + checksumError.clientChecksum + " Expected: " + checksumError.calculatedChecksum)
+      complete(StatusCodes.Unauthorized, ErrorMessage("Checksums don't match"))
     case clientError: UnknownClient =>
       complete(StatusCodes.Forbidden,
         ErrorMessage("Unknown client: " + clientError.clientId))

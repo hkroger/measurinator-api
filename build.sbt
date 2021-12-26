@@ -2,7 +2,7 @@ name := "api"
 
 version := "1.0"
 
-scalaVersion := "2.13.2"
+scalaVersion := "2.13.7"
 
 resolvers ++= Seq(
   "Typesafe repository snapshots" at "https://repo.typesafe.com/typesafe/snapshots/",
@@ -17,13 +17,14 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= {
-  val akkaHttpV = "10.1.12"
-  val akkaStreamV = "2.6.6"
-  val cassandraV = "3.9.0"
-  val nscalaV = "2.24.0"
-  val logbackV = "1.2.3"
+  val akkaHttpV = "10.2.7"
+  val akkaStreamV = "2.6.18"
+  val cassandraV = "3.11.0"
+  val nscalaV = "2.30.0"
+  val logbackV = "1.2.10"
   val hasherV = "1.2.2"
-  val scalaTestV = "3.1.2"
+  val scalaTestV = "3.2.2"
+  val scalaLoggingV = "3.9.4"
 
   Seq(
     "com.typesafe.akka" %% "akka-http-core" % akkaHttpV,
@@ -37,7 +38,8 @@ libraryDependencies ++= {
     "com.datastax.cassandra" % "cassandra-driver-mapping" % cassandraV,
     "com.github.nscala-time" %% "nscala-time" % nscalaV,
     "org.scalactic" %% "scalactic" % scalaTestV,
-    "org.scalatest" %% "scalatest" % scalaTestV % "test"
+    "org.scalatest" %% "scalatest" % scalaTestV % "test",
+  "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingV
   )
 }
 
@@ -46,6 +48,6 @@ enablePlugins(DockerPlugin)
 
 mainClass in Compile := Some("com.measurinator.api.Api")
 
-dockerBaseImage := "openjdk:jre"
+dockerBaseImage := "openjdk:11-slim"
 dockerExposedPorts := Seq(8899)
 packageName in Docker := "hkroger/measurinator-api"

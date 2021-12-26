@@ -46,7 +46,7 @@ trait ChecksumCalculator {
   def checkChecksum(clientMeasurement: ClientMeasurement, secret: String) {
     val calculatedChecksum = calculateChecksum(clientMeasurement, secret)
     if (!clientMeasurement.checksum.equals(calculatedChecksum)) {
-      throw new ChecksumErrorException(clientMeasurement.checksum, calculatedChecksum)
+      throw ChecksumErrorException(clientMeasurement.checksum, calculatedChecksum)
     }
   }
 
